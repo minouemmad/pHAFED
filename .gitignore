@@ -1,0 +1,26 @@
+# Ignore everything inside big dirs
+GLU/*
+ASP/*
+HP36-old-runs/*
+HEWL-750/*
+OMTKY3-750/*
+BBL-750/*
+
+# But allow traversal into subdirectories
+!GLU/**/
+!ASP/**/
+!HP36-old-runs/**/
+!HEWL-750/**/
+!OMTKY3-750/**/
+!BBL-750/**/
+
+# Ignore heavy file types
+*.arc*
+*.log
+*.dcd
+*.pdb*
+*.dyn
+
+# ✅ Allow .esv files everywhere
+!*.esv
+
