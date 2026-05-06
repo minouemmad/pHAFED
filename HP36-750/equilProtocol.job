@@ -1,0 +1,36 @@
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N HP36-1.00                  # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q MS,INFORMATICS-GPU                     # Queue
+#$ -pe smp 10                # Request 12 tasks/node, 12 total
+#$ -l ngpus=1
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -l h_rt=500:00:00         # Run Time
+#$ -S /bin/bash              # Shell to use
+
+use_ffxc=/Dedicated/schnieders/andthiel/forcefieldx/bin/ffxc
+struct="hp36_solv"
+
+## Equilibration, 1 nsec, NVT at 100K
+cp ${struct}_min.pdb ${struct}_100k.pdb
+$use_ffxc test.PhDynamics -Dplatform=OMM --mdE OpenMM --cycles 5 --titrationSteps 1 --coordinateSteps 1000000 -t 100 -Dguess.titration.state=true -Dlambda.tautomer.initial=0.0 -Dfix.titration.lambda=true -Dfix.tautomer.lambda=true -Dkey=${struct}.key -i Stochastic --dt 1.0 --pH 1.00 --ia=${inactive} ${struct}_100k.pdb > ${struct}_100k.log
+## Equilibration, 1 nsec, NVT at 200K
+cp ${struct}_min.pdb ${struct}_200k.pdb
+cp ${struct}_100k.dyn ${struct}_200k.dyn
+cp ${struct}_100k.esv ${struct}_200k.esv
+$use_ffxc test.PhDynamics -Dplatform=OMM --mdE OpenMM --cycles 5 --titrationSteps 1 --coordinateSteps 1000000 -t 200 -Dguess.titration.state=true -Dlambda.tautomer.initial=0.0 -Dfix.titration.lambda=true -Dfix.tautomer.lambda=true -Dkey=${struct}.key -i Stochastic --dt 1.0 --pH 1.00 --ia=${inactive} ${struct}_200k.pdb > ${struct}_200k.log
+## Equilibration, 1 nsec, NVT at 300K
+cp ${struct}_min.pdb ${struct}_300k.pdb
+cp ${struct}_200k.dyn ${struct}_300k.dyn
+cp ${struct}_200k.esv ${struct}_300k.esv
+$use_ffxc test.PhDynamics -Dplatform=OMM --mdE OpenMM --cycles 5 --titrationSteps 1 --coordinateSteps 1000000 -t 300 -Dguess.titration.state=true -Dlambda.tautomer.initial=0.0 -Dfix.titration.lambda=true -Dfix.tautomer.lambda=true -Dkey=${struct}.key -i Stochastic --dt 1.0 --pH 1.00 --ia=${inactive} ${struct}_300k.pdb > ${struct}_300k.log
+## Getting ready for pH RepEx Production
+## Remember to grab the last snap shot for PDB archive.
+cp ${struct}_300k.pdb ${struct}.pdb
+cp ${struct}_300k.esv ${struct}.esv
+cp ${struct}_300k.dyn ${struct}.dyn
+##$use_ffxc test.PhDynamics -n 1 -i Stochastic -k 0.001 --pH 1.00 ${struct}.pdb
+

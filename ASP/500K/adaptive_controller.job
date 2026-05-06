@@ -1,0 +1,46 @@
+#!/bin/bash
+#$ -V
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#$ -N adapt-phafed
+#$ -q MS
+#$ -pe smp 10              # Request 12 tasks/node, 12 total
+#$ -l h_rt=240:00:00
+#$ -o adaptive_controller.$JOB_ID.log
+
+set -euo pipefail
+
+if [[ -z "${WINDOW_DIR:-}" ]]; then
+  echo "ERROR: WINDOW_DIR env var is required" >&2
+  exit 1
+fi
+
+if [[ -z "${PROJECT_DIR:-}" ]]; then
+  echo "ERROR: PROJECT_DIR env var is required" >&2
+  exit 1
+fi
+
+PYTHON_BIN="${PYTHON_BIN:-python}"
+ESV_NAME="${ESV_NAME:-ASP_penta.esv}"
+ESV_INDEX="${ESV_INDEX:-0}"
+MAX_CHUNKS="${MAX_CHUNKS:-20}"
+POLL_SECONDS="${POLL_SECONDS:-300}"
+REQUIRED_STABLE_CHUNKS="${REQUIRED_STABLE_CHUNKS:-2}"
+MIN_TOTAL_COUNTS="${MIN_TOTAL_COUNTS:-200000}"
+WINDOW_JOB_NAME="${WINDOW_JOB_NAME:-dynamic.job}"
+
+cd "$WINDOW_DIR"
+
+echo "Running adaptive controller in: $(pwd)"
+echo "Project dir: $PROJECT_DIR"
+echo "Python: $PYTHON_BIN"
+
+"$PYTHON_BIN" "$PROJECT_DIR/adaptive_qsub_convergence.py" \
+  --job-script "$WINDOW_JOB_NAME" \
+  --esv "$ESV_NAME" \
+  --esv-index "$ESV_INDEX" \
+  --max-chunks "$MAX_CHUNKS" \
+  --required-stable-chunks "$REQUIRED_STABLE_CHUNKS" \
+  --min-total-counts "$MIN_TOTAL_COUNTS" \
+  --poll-seconds "$POLL_SECONDS"

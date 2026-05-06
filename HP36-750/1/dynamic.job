@@ -1,0 +1,20 @@
+#!/bin/bash
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N HP36-pH150-afed      # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q UI,MS,all.q        # Queue
+#$ -pe 128cpn 128            # Request 80 cpus/node, 80 total
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -S /bin/bash              # Shell to use
+
+## Getting ready for pHAFED Production
+## Remember to grab the last snap shot for PDB archive.
+cp hp36_solv_300k.pdb hp36_solv.pdb
+cp hp36_solv_300k.esv hp36_solv.esv
+cp hp36_solv_300k.dyn hp36_solv.dyn
+
+myffxc="/Dedicated/schnieders/maemmad/forcefieldx-phafed/bin/ffxc"
+$myffxc test.PhDynamics --phAFED --pH 1.50 -i Stochastic -b Adiabatic --thetaFriction 0.5 --thetaMass 750 --thetaTemp 750 -n 5000000 -r 0.5 --dt 1.0 hp36_solv.pdb

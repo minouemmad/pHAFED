@@ -1,0 +1,14 @@
+#!/bin/bash
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N OMTKY3-pH250-afed      # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q UI,MS,all.q        # Queue
+#$ -pe 128cpn 128            # Request 128 cpus/node, 128 total
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -S /bin/bash              # Shell to use
+
+myffxc="/Dedicated/schnieders/maemmad/forcefieldx-phafed/bin/ffxc"
+$myffxc test.PhDynamics --phAFED --pH 2.50 -i Stochastic -b Adiabatic --thetaFriction 0.5 --thetaMass 750 --thetaTemp 750 -n 5000000 -r 0.5 --dt 1.0 1omu_solv.pdb

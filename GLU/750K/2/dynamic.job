@@ -1,0 +1,14 @@
+#$ -V                        # Inherit current environment
+#$ -r y                      # Restart
+#$ -ckpt user                # Restart under user
+#$ -cwd                      # Start job in submission directory
+#$ -N GLU-750K            # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q MS,all.q      # Queue
+#$ -pe 128cpn 128             # Request 16 tasks/node, 16 total
+#$ -l gpu=true
+#$ -o $JOB_ID.log      # Name of output file
+#$ -l h_rt=10000:00:00       # Run Time
+#$ -S /bin/bash              # Shell to use
+
+/Dedicated/schnieders/maemmad/forcefieldx-phafed/bin/ffxc -Dpj.nn=8 -Dpj.nt=14 -DnumCudaDevices=1 test.PhDynamics -Dplatform=OMM --mdE OpenMM -i Stochastic -b Adiabatic --phAFED --thetaFriction 0.5 --thetaMass 750 --thetaTemp 750 -Dguess.titration.state=true --cycles 4000 --titrationSteps 1000 --coordinateSteps 9000 -F xyz --initDynamics 1 -r 1 --pH 3.75 GLU_penta.pdb

@@ -1,0 +1,14 @@
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N GLU-equil              # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q MS,IVRVOLTA,COE-GPU,INFORMATICS-GPU,all.q                  # Queue
+#$ -pe smp 10
+#$ -l gpu=true
+#$ -l ngpus=1
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -S /bin/bash              # Shell to use
+
+/Dedicated/schnieders/andthiel/forcefieldx/bin/ffxc test.PhDynamics -Dplatform=OMM --mdE OpenMM --cycles 10 --titrationSteps 1 --coordinateSteps 50000 -Dlambda.tautomer.initial=0.0 -Dfix.titration.lambda=true -Dfix.tautomer.lambda=true -i Stochastic --dt 1.0 --pH pKa  GLU_penta.pdb 

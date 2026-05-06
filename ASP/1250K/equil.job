@@ -1,0 +1,15 @@
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N ASPpenta-#                 # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q all.q                  # Queue
+#$ -pe smp 10
+#$ -l gpu=true
+#$ -l ngpus=1
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -S /bin/bash              # Shell to use
+
+#### Generate random number between 1 and 0 for tautomer:  $((0 + $RANDOM % 2))
+/Dedicated/schnieders/andthiel/forcefieldx/bin/ffxc test.PhDynamics -Dplatform=OMM --mdE OpenMM --cycles 10 --titrationSteps 1 --coordinateSteps 50000 -Dguess.titration.state=true -Dlambda.tautomer.initial=$((0 + $RANDOM % 2)) -Dfix.titration.lambda=true -Dfix.tautomer.lambda=true -i Stochastic --dt 1.0 --pH pKa ASP_penta.pdb 

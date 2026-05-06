@@ -1,0 +1,14 @@
+#$ -r n                      # Restartable
+#$ -ckpt user                # Restart under user; do not change (do not replace with your username)
+#$ -V                        # Inherit current environment
+#$ -cwd                      # Start job in submission directory
+#$ -N HDECK-afed-cphmd              # Job Name
+#$ -j y                      # Combine stderr and stdout
+#$ -q UI,COE,MS,all.q                # Queue
+#$ -pe 128cpn 128             # Request 12 tasnas/node, 12 total
+#$ -o $JOB_NAME.$JOB_ID.log  # Name of output file
+#$ -S /bin/bash              # Shell to use
+
+myffxc="/Dedicated/schnieders/maemmad/forcefieldx/bin/ffxc"
+$myffxc test.PhDynamics --phAFED --pH 7.4 -i Verlet -b Adiabatic --thetaFriction 0 --thetaMass 5 --thetaTemp 298.15 -n 1000000 -r 0.1 --dt 1.0 HDECK_afed.pdb| tee HDECK.nve.afed.log
+
